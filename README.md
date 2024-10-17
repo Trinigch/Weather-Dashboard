@@ -6,8 +6,9 @@ This project is about a weather dashboard application that calls the OpenWeather
 
 ## Technologies
 
+-Typescript
 -node.js
--JavaScript
+-express
 
 ## Installation
 

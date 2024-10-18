@@ -26,6 +26,8 @@ class WeatherService {
   // TODO: Create fetchLocationData method
 
   private async fetchLocationData(query: string): Promise<any> {
+
+    
     const response = await fetch(`${this.baseURL}/geo/1.0/direct?q=${query}&limit=1&appid=${this.apiKey}`);
     const data = await response.json();
     return data[0];

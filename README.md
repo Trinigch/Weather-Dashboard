@@ -19,9 +19,6 @@ npm install
 To start the application, run the following command:
 
 -npm run start
-   
-#  The walkthrough video thatt demonstrate how a user would invoke the application from the command line
-
 
 
 ## Credits

@@ -1,7 +1,7 @@
 
 import { readFile, writeFile } from 'fs/promises';
 // TODO: Define a City class with name and id properties
-class  City {
+export class  City {
   id: string;
   name: string;
   constructor(id: string, name: string){
@@ -39,4 +39,4 @@ class HistoryService {
   // async removeCity(id: string) {}
 }
 
-export default new HistoryService();
+export default new HistoryService() ;

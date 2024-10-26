@@ -40,15 +40,23 @@ const fetchWeather = async (cityName: string) => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ cityName }),
+    body: JSON.stringify({ cityName }), 
   });
 
   const weatherData = await response.json();
 
-  console.log('weatherData: ', weatherData);
 
-  renderCurrentWeather(weatherData[0]);
-  renderForecast(weatherData.slice(1));
+ // const weatherData = [
+ //   { city: "Sample City", date: "2023-10-24", icon: "cloudy", iconDescription: "Cloudy", tempF: 75, windSpeed: 10, humidity: 60 },
+    // Agrega más datos para el pronóstico, si es necesario
+//  ];
+  console.log('weatherData: ', weatherData);
+  
+  console.log('weatherData[1]: ', weatherData[1]);
+  renderCurrentWeather(weatherData);
+  renderForecast(weatherData);
+  //renderCurrentWeather(weatherData[0]);
+ // renderForecast(weatherData.slice(1));
 };
 
 const fetchSearchHistory = async () => {
@@ -147,7 +155,7 @@ const renderSearchHistory = async (searchHistory: any) => {
 
     if (!historyList.length) {
       searchHistoryContainer.innerHTML =
-        '<p class="text-center">No Previous Search History</p>';
+        '<p class="text-center">----No Previous Search History</p>';
     }
 
     // * Start at end of history array and count down to show the most recent cities at the top.

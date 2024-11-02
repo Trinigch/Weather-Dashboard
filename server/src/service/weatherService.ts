@@ -10,18 +10,18 @@ class Weather {
   city: string;
   date: string;
   icon:string;
-  description: string;
-  temp: number;
+  iconDescription: string;
+  tempF: number;
   humidity: number;
   windSpeed:number;
 
 
-  constructor(city: string, date: string, icon:string, description: string, temp: number, humidity: number, windSpeed:number, ) {
+  constructor(city: string, date: string, icon:string, iconDescription: string, tempF: number, humidity: number, windSpeed:number) {
     this.city = city;
     this.date = date;
     this.icon = icon;
-    this.description = description;
-    this.temp = temp;
+    this.iconDescription = iconDescription;
+    this.tempF = tempF;
     this.humidity = humidity;
     this.windSpeed=windSpeed;
   }
@@ -59,7 +59,7 @@ class WeatherService {
   }
 
   private buildWeatherQuery(coordinates: Coordinates): string {
-    return `${this.baseURL}/data/2.5/weather?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}`;
+    return `${this.baseURL}/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&units=imperial&appid=${this.apiKey}`;
   }
 
   private async fetchAndDestructureLocationData(): Promise<Coordinates> {
@@ -67,29 +67,55 @@ class WeatherService {
     return this.destructureLocationData(locationData);
   }
 
-  private async fetchWeatherData(coordinates: Coordinates): Promise<any> {
+  private async fetchWeatherData(coordinates: Coordinates){
     const response = await fetch(this.buildWeatherQuery(coordinates));
-    return await response.json();
+    let res = await response.json();
+    let currentWeather: Weather= this.parseCurrentWeather(res);
+    let forcastArray: Weather[]=  this.buildForecastArray(currentWeather,res.list)
+    return forcastArray
+  
   }
+  /* [object, [object]]*/
 
   private parseCurrentWeather(response: any): Weather {
-
-    const city = response.name;
-    const date = new Date(response.dt * 1000).toLocaleDateString();  // Convierte el timestamp a fecha
-    const icon = response.icon;
-    const description = response.weather[0].description;
-    const temperature = response.main.temp;
-    const humidity = response.main.humidity;
-    const windSpeed= response.wind.speed;
-  
-    return new Weather(city, date ,icon,description, temperature, humidity ,windSpeed );
+    let  currentWeather = response.list[0];
+    const city = this.cityName;
+    const date = new Date(currentWeather.dt * 1000).toLocaleDateString();  // Convierte el timestamp a fecha
+    const icon = currentWeather.weather[0].icon;
+    const description = currentWeather.weather[0].description;
+    const temperature = currentWeather.main.temp;
+    const humidity = currentWeather.main.humidity;
+    const windSpeed= currentWeather.wind.speed;
+  let currentData= new Weather(city, date ,icon,description, temperature, humidity ,windSpeed );
+    return currentData
+  }
+  private buildForecastArray(currentWeather: Weather, weatherData: any[]) {
+let weatherArray : Weather[] = [currentWeather];
+let filterForcast = weatherData.filter((data:any)=> {
+  return data.dt_txt.includes("12:00:00");
+})
+for(const day of filterForcast){
+  weatherArray.push(
+    new Weather(
+      this.cityName, 
+      new Date(day.dt * 1000).toLocaleDateString(),
+      day.weather[0].icon,
+      day.weather[0].description,
+      day.main.temp,
+      day.main.humidity,
+      day.wind.speed
+       )
+     )
+    }
+return weatherArray    
   }
 
-  async getWeatherForCity(city: string): Promise<Weather> {
+  async getWeatherForCity(city: string) {
     this.cityName = city;
     const coordinates = await this.fetchAndDestructureLocationData();
     const weatherData = await this.fetchWeatherData(coordinates);
-    return this.parseCurrentWeather(weatherData);
+
+    return  weatherData
   }
 }
 
